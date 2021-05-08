@@ -1,0 +1,23 @@
+{
+  "name": "spreadsheet-app",
+  "version": "1.0.1",
+  "description": "This is an excel like application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siddharth-bhatnagar/spreadsheet-app.git"
+  },
+  "author": "Siddharth",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/siddharth-bhatnagar/spreadsheet-app/issues"
+  },
+  "homepage": "https://github.com/siddharth-bhatnagar/spreadsheet-app#readme",
+  "devDependencies": {
+    "electron": "^12.0.7"
+  }
+}
