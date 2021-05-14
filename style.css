@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 * {
@@ -89,13 +89,11 @@ body {
     width: 10vw;
     min-width: 130px;
     font-family: Noto Sans;
-    font-size: 1rem;
 }
 
 #font-size {
     width: 3.5vw;
     min-width: 55px;
-    font-size: 1rem;
 }
 
 .formula-bar {
@@ -179,22 +177,22 @@ body {
 
 .column-name {
     min-width: 100px;
+    width: 100px;
     border-right: 1px solid lightgray;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: 600;
+    font-weight: bold;
 }
 
 .row-name {
     min-height: 25px;
+    height: 25px;
     border-bottom: 1px solid lightgray;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: 600;
-    font-size: 0.6rem;
+    font-weight: bold;
 }
 
 .cell-row {
@@ -237,4 +235,22 @@ body {
 
 .input-cell.right-selected {
     border-right: 1px solid lightgray;
+}
+
+.menu-icon.selected {
+    background-color: lightgray;
+}
+
+.input-cell:hover {
+    cursor: cell;
+}
+
+#fill-color {
+    border-bottom: 4px solid #fff;
+    padding-bottom: 2px;
+}
+
+#text-color {
+    border-bottom: 4px solid #444;
+    padding-bottom: 2px;
 }
