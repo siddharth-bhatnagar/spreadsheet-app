@@ -19,12 +19,26 @@ for (let i = 1; i <= 100; i++) {
     $("#rows").append(`<div class="row-name">${i}</div>`);
 }
 
-// Generating cells
+// Generating cells and cell data init
+let cellData = [];
 for (let i = 1; i <= 100; i++) {
     let row = $('<div class="cell-row"></div>');
+    let rowData = [];
     for (let j = 1; j <= 100; j++) {
         row.append(`<div id="row-${i}-col-${j}" class="input-cell" contenteditable="false"></div>`);
+        rowData.push({
+            "font-family": "Times New Roman",
+            "font-size": "18",
+            "text": "",
+            "bold": false,
+            "italic": false,
+            "underlined": false,
+            "alignment": "left",
+            "color": "",
+            "bgcolor": ""
+        });
     }
+    cellData.push(rowData);
     $("#cells").append(row);
 }
 
@@ -56,6 +70,7 @@ const getAdjacentCells = (row, col) => {
 
 $(".input-cell").dblclick(function (e) {
     $(".input-cell.selected").removeClass("selected top-selected down-selected left-selected right-selected");
+    $(this).addClass("selected");
     $(this).attr("contenteditable", "true");
     $(this).focus();
 });
@@ -129,6 +144,27 @@ function selectCell(element, event, top, left, down, right) {
         $(".input-cell.selected").removeClass("selected top-selected down-selected left-selected right-selected");
     }
     $(element).addClass("selected");
+    changeHeader(getRowColumn(element));
+}
+
+// making changes two way
+function changeHeader([rowID, colID]) {
+    let data = cellData[rowID - 1][colID - 1];
+    $(".alignment.selected").removeClass("selected");
+    $(`.alignment[data-type=${data.alignment}]`).addClass("selected");
+
+    updateFontStyleHeader(data, "bold");
+    updateFontStyleHeader(data, "italic");
+    updateFontStyleHeader(data, "underlined");
+}
+
+function updateFontStyleHeader(data, property) {
+    if (data[property]) {
+        $(`#${property}`).addClass("selected");
+    }
+    else {
+        $(`#${property}`).removeClass("selected");
+    }
 }
 
 function unselectCell(element, event, top, left, down, right) {
@@ -163,7 +199,7 @@ let scrollXLStarted = false;
 
 // only used for scrolling/selecting start cell
 $(".input-cell").mousemove(function (e) {
-    
+
     if (e.buttons == 1) {
         e.preventDefault();
         if (e.pageX > ($(window).width() - 10) && !scrollXRStarted) {
@@ -301,6 +337,81 @@ $(".data-container").mouseup(function (e) {
     // console.log("mouseup");
 });
 
+// handling text-alignment
+$(".alignment").click(function (e) {
+    let alignment = $(this).attr("data-type");
+    $(".alignment.selected").removeClass("selected");
+    $(this).addClass("selected");
+    $(".input-cell.selected").css("text-align", alignment);
+    $(".input-cell.selected").each(function (index, data) {
+        let [rowID, colID] = getRowColumn(data);
+        cellData[rowID - 1][colID - 1].alignment = alignment;
+    });
+});
 
+// handling text styles
+$("#bold").click(function (e) {
+    setStyle(this, "bold", "font-weight", "bold");
+});
 
+$("#italic").click(function (e) {
+    setStyle(this, "italic", "font-style", "italic");
+});
 
+$("#underlined").click(function (e) {
+    setStyle(this, "underlined", "text-decoration", "underline");
+});
+
+function setStyle(element, property, key, value) {
+    if ($(element).hasClass("selected")) {
+        $(element).removeClass("selected");
+        $(".input-cell.selected").css(key, "");
+        $(".input-cell.selected").each(function (index, data) {
+            let [rowID, colID] = getRowColumn(data);
+            cellData[rowID - 1][colID - 1][property] = false;
+        });
+    }
+    else {
+        $(element).addClass("selected");
+        $(".input-cell.selected").css(key, value);
+        $(".input-cell.selected").each(function (index, data) {
+            let [rowID, colID] = getRowColumn(data);
+            cellData[rowID - 1][colID - 1][property] = true;
+        });
+    }
+}
+
+// renders color picker jquery
+$(".pick-color").colorPick({
+    'initialColor': "#ABCD",
+    'allowRecent': true,
+    'recentMax': 5,
+    'allowCustomColor': false,
+    'palette': ["#1abc9c", "#16a085", "#2ecc71", "#27ae60", "#3498db", "#2980b9", "#9b59b6", "#8e44ad", "#34495e", "#2c3e50", "#f1c40f", "#f39c12", "#e67e22", "#d35400", "#e74c3c", "#c0392b", "#ecf0f1", "#bdc3c7", "#95a5a6", "#7f8c8d"],
+    'onColorSelected': function () {
+        if (this.color != "#ABCD") {
+            if ($(this.element.children()[1]).attr("id") == "fill-color") {
+                $(".input-cell.selected").css("background-color", this.color);
+                $("#fill-color").css("border-bottom", `4px solid ${this.color}`);
+            }
+
+            if ($(this.element.children()[1]).attr("id") == "text-color") {
+                $(".input-cell.selected").css("color", this.color);
+                $("#text-color").css("border-bottom", `4px solid ${this.color}`);
+            }
+        }
+    }
+});
+
+// clicks on the main div
+$("#fill-color").click(function (e) {
+    setTimeout(() => {
+        $(this).parent().click();
+    }, 10);
+});
+
+$("#text-color").click(function (e) {
+    setTimeout(() => {
+        $(this).parent().click();
+    }, 10);
+});
