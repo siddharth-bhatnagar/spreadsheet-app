@@ -158,12 +158,12 @@ let startCell = {};
 let endCell = {};
 let scrollXRStarted = false;
 let scrollXLStarted = false;
-let scrollYTStarted = false;
-let scrollYDStarted = false;
+// let scrollYTStarted = false;
+// let scrollYDStarted = false;
+
 // only used for scrolling/selecting start cell
 $(".input-cell").mousemove(function (e) {
-    // console.log($(window).height());
-    // console.log(e.pageY);
+    
     if (e.buttons == 1) {
         e.preventDefault();
         if (e.pageX > ($(window).width() - 10) && !scrollXRStarted) {
@@ -173,12 +173,12 @@ $(".input-cell").mousemove(function (e) {
             scrollXL();
         }
 
-        if(e.pageY > ($(window).height() - 50) && !scrollYDStarted) {
-            scrollYD();
-        } 
-        else if(e.pageY < (235) && !scrollYTStarted) {
-            scrollYT();
-        }
+        // if(e.pageY > ($(window).height() - 30) && !scrollYDStarted) {
+        //     scrollYD();
+        // } 
+        // else if(e.pageY > 222 && e.pageY < 250 && !scrollYTStarted) {
+        //     scrollYT();
+        // }
 
         if (!startCellSelected) {
             let [rowID, colID] = getRowColumn(this);
@@ -205,15 +205,15 @@ $(".input-cell").mouseenter(function (e) {
             scrollXLStarted = false;
         }
 
-        if(e.pageY > 235 && scrollYTStarted) {
-            clearInterval(scrollYTInterval);
-            scrollYTStarted = false;
-        }
+        // if(e.pageY > 250 || e.pageY < 222 && scrollYTStarted) {
+        //     clearInterval(scrollYTInterval);
+        //     scrollYTStarted = false;
+        // }
 
-        if(e.pageY < ($(window).height() - 50) && scrollYDStarted) {
-            clearInterval(scrollYDInterval);
-            scrollYDStarted = false;
-        }
+        // if(e.pageY < $(window).height() - 30 && scrollYDStarted) {
+        //     clearInterval(scrollYDInterval);
+        //     scrollYDStarted = false;
+        // }
 
         let [rowID, colID] = getRowColumn(this);
         endCell = { "rowID": rowID, "colID": colID };
@@ -253,20 +253,20 @@ function scrollXL() {
 }
 
 // vertical up
-let scrollYTInterval;
-function scrollYT() {
-    scrollYTInterval = setInterval(() => {
-        $("#cells").scrollTop($("#cells").scrollTop() - 100);
-    }, 100);
-}
+// let scrollYTInterval;
+// function scrollYT() {
+//     scrollYTInterval = setInterval(() => {
+//         $("#cells").scrollTop($("#cells").scrollTop() - 50);
+//     }, 100);
+// }
 
-// vertical down
-let scrollYDInterval;
-function scrollYD() {
-    scrollYDInterval = setInterval(() => {
-        $("#cells").scrollTop($("#cells").scrollTop() + 100);
-    }, 100);
-}
+// // vertical down
+// let scrollYDInterval;
+// function scrollYD() {
+//     scrollYDInterval = setInterval(() => {
+//         $("#cells").scrollTop($("#cells").scrollTop() + 50);
+//     }, 100);
+// }
 
 // handles selection + scrolling
 $(".data-container").mousemove(function (e) {
@@ -279,12 +279,12 @@ $(".data-container").mousemove(function (e) {
             scrollXL();
         }
 
-        if(e.pageY > ($(window).height() - 50) && !scrollYDStarted) {
-            scrollYD();
-        } 
-        else if(e.pageY < (235) && !scrollYTStarted) {
-            scrollYT();
-        }
+        // if(e.pageY > ($(window).height() - 30) && !scrollYDStarted) {
+        //     scrollYD();
+        // } 
+        // else if(e.pageY > 222 && e.pageY < 250 && !scrollYTStarted) {
+        //     scrollYT();
+        // }
     }
 });
 
@@ -292,13 +292,15 @@ $(".data-container").mousemove(function (e) {
 $(".data-container").mouseup(function (e) {
     clearInterval(scrollXRInterval);
     clearInterval(scrollXLInterval);
-    clearInterval(scrollYTInterval);
-    clearInterval(scrollYDInterval);
-
     scrollXLStarted = false;
     scrollXRStarted = false;
-    scrollYTStarted = false;
-    scrollYDStarted = false;
+    // clearInterval(scrollYTInterval);
+    // clearInterval(scrollYDInterval);
+    // scrollYTStarted = false;
+    // scrollYDStarted = false;
+    // console.log("mouseup");
 });
+
+
 
 
