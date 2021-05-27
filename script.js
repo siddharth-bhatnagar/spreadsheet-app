@@ -20,25 +20,31 @@ for (let i = 1; i <= 100; i++) {
 }
 
 // Generating cells and cell data init
-// let cellData = [];
+
+let cellData = {
+    "Sheet1": {}
+};
+
+let selectedSheet = "Sheet1";
+let totalSheets = 1;
+
+let defaultProperties = {
+    "font-family": "Times New Roman",
+    "font-size": "18",
+    "text": "",
+    "bold": false,
+    "italic": false,
+    "underlined": false,
+    "alignment": "left",
+    "color": "#000000",
+    "bgcolor": "#ffffff"
+};
+
 for (let i = 1; i <= 100; i++) {
     let row = $('<div class="cell-row"></div>');
-    let rowData = [];
     for (let j = 1; j <= 100; j++) {
         row.append(`<div id="row-${i}-col-${j}" class="input-cell" contenteditable="false"></div>`);
-        rowData.push({
-            "font-family": "Times New Roman",
-            "font-size": "18",
-            "text": "",
-            "bold": false,
-            "italic": false,
-            "underlined": false,
-            "alignment": "left",
-            "color": "#000000",
-            "bgcolor": "#ffffff"
-        });
     }
-    cellData.push(rowData);
     $("#cells").append(row);
 }
 
@@ -149,6 +155,7 @@ function selectCell(element, event, top, left, down, right) {
 
 // making changes two way
 function changeHeader([rowID, colID]) {
+    console.log(cellData);
     let data = cellData[rowID - 1][colID - 1];
     $(".alignment.selected").removeClass("selected");
     $(`.alignment[data-type=${data.alignment}]`).addClass("selected");
@@ -353,10 +360,7 @@ $(".alignment").click(function (e) {
     $(".alignment.selected").removeClass("selected");
     $(this).addClass("selected");
     $(".input-cell.selected").css("text-align", alignment);
-    $(".input-cell.selected").each(function (index, data) {
-        let [rowID, colID] = getRowColumn(data);
-        cellData[rowID - 1][colID - 1].alignment = alignment;
-    });
+    updateCellData("alignment", alignment);
 });
 
 // handling text styles
@@ -376,18 +380,12 @@ function setStyle(element, property, key, value) {
     if ($(element).hasClass("selected")) {
         $(element).removeClass("selected");
         $(".input-cell.selected").css(key, "");
-        $(".input-cell.selected").each(function (index, data) {
-            let [rowID, colID] = getRowColumn(data);
-            cellData[rowID - 1][colID - 1][property] = false;
-        });
+        updateCellData(property, true);
     }
     else {
         $(element).addClass("selected");
         $(".input-cell.selected").css(key, value);
-        $(".input-cell.selected").each(function (index, data) {
-            let [rowID, colID] = getRowColumn(data);
-            cellData[rowID - 1][colID - 1][property] = true;
-        });
+        updateCellData(property, false);
     }
 }
 
@@ -403,19 +401,13 @@ $(".pick-color").colorPick({
             if ($(this.element.children()[1]).attr("id") == "fill-color") {
                 $(".input-cell.selected").css("background-color", this.color);
                 $("#fill-color").css("border-bottom", `4px solid ${this.color}`);
-                $(".input-cell.selected").each((index, data) => {
-                    let [rowID, colID] = getRowColumn(data);
-                    cellData[rowID - 1][colID - 1].bgcolor = this.color;
-                });
+                updateCellData("bgcolor", this.color);
             }
 
             if ($(this.element.children()[1]).attr("id") == "text-color") {
                 $(".input-cell.selected").css("color", this.color);
                 $("#text-color").css("border-bottom", `4px solid ${this.color}`);
-                $(".input-cell.selected").each((index, data) => {
-                    let [rowID, colID] = getRowColumn(data);
-                    cellData[rowID - 1][colID - 1].color = this.color;
-                });
+                updateCellData("color", this.color);
             }
         }
     }
@@ -447,8 +439,35 @@ $(".menu-selector").change(function (e) {
     }
 
     $(".input-cell.selected").css(key, value);
-    $(".input-cell.selected").each((i, data) => {
-        let [rowID, colID] = getRowColumn(data);
-        cellData[rowID - 1][colID - 1][key] = value;
-    });
+    updateCellData(key, value);
 });
+
+function updateCellData(property, value) {
+    if (property != defaultProperties[property]) {
+        $(".input-cell.selected").each(function (index, data) {
+            let [rowID, colID] = getRowColumn(data);
+            if (cellData[selectedSheet][rowID - 1] == undefined) {
+                cellData[selectedSheet][rowID - 1] = {};
+                cellData[selectedSheet][rowID - 1][colID - 1] = { ...defaultProperties };
+                cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+            }
+            else {
+                if (cellData[selectedSheet][rowID - 1][colID - 1] == undefined) {
+                    cellData[selectedSheet][rowID - 1][colID - 1] = { ...defaultProperties };
+                    cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+                }
+                else {
+                    cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+                }
+            }
+        });
+    }
+    else {
+        if (cellData[selectedSheet][rowID - 1][colID - 1] != undefined) {
+            cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+            if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
+                delete cellData[selectedSheet][rowID - 1][colID - 1];
+            }
+        }
+    }
+}
