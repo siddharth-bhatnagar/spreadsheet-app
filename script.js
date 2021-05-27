@@ -34,8 +34,8 @@ for (let i = 1; i <= 100; i++) {
             "italic": false,
             "underlined": false,
             "alignment": "left",
-            "color": "",
-            "bgcolor": ""
+            "color": "#000000",
+            "bgcolor": "#ffffff"
         });
     }
     cellData.push(rowData);
@@ -156,6 +156,13 @@ function changeHeader([rowID, colID]) {
     updateFontStyleHeader(data, "bold");
     updateFontStyleHeader(data, "italic");
     updateFontStyleHeader(data, "underlined");
+
+    $("#fill-color").css("border-bottom", `4px solid ${data.bgcolor}`);
+    $("#text-color").css("border-bottom", `4px solid ${data.color}`);
+
+    $("#font-family").val(data["font-family"]);
+    $("#font-size").val(data["font-size"]);
+    $("#font-family").css("font-family", data["font-family"]);
 }
 
 function updateFontStyleHeader(data, property) {
@@ -393,11 +400,19 @@ $(".pick-color").colorPick({
             if ($(this.element.children()[1]).attr("id") == "fill-color") {
                 $(".input-cell.selected").css("background-color", this.color);
                 $("#fill-color").css("border-bottom", `4px solid ${this.color}`);
+                $(".input-cell.selected").each((index, data) => {
+                    let [rowID, colID] = getRowColumn(data);
+                    cellData[rowID - 1][colID - 1].bgcolor = this.color;
+                });
             }
 
             if ($(this.element.children()[1]).attr("id") == "text-color") {
                 $(".input-cell.selected").css("color", this.color);
                 $("#text-color").css("border-bottom", `4px solid ${this.color}`);
+                $(".input-cell.selected").each((index, data) => {
+                    let [rowID, colID] = getRowColumn(data);
+                    cellData[rowID - 1][colID - 1].color = this.color;
+                });
             }
         }
     }
@@ -414,4 +429,23 @@ $("#text-color").click(function (e) {
     setTimeout(() => {
         $(this).parent().click();
     }, 10);
+});
+
+$(".menu-selector").change(function (e) {
+    let value = $(this).val();
+    let key = $(this).attr("id");
+
+    if (key == "font-family") {
+        $("#font-family").css(key, value);
+    }
+
+    if (!isNaN(value)) {
+        value = parseInt(value);
+    }
+
+    $(".input-cell.selected").css(key, value);
+    $(".input-cell.selected").each((i, data) => {
+        let [rowID, colID] = getRowColumn(data);
+        cellData[rowID - 1][colID - 1][key] = value;
+    });
 });
