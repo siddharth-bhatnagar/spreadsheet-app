@@ -20,7 +20,7 @@ for (let i = 1; i <= 100; i++) {
 }
 
 // Generating cells and cell data init
-let cellData = [];
+// let cellData = [];
 for (let i = 1; i <= 100; i++) {
     let row = $('<div class="cell-row"></div>');
     let rowData = [];
@@ -157,11 +157,14 @@ function changeHeader([rowID, colID]) {
     updateFontStyleHeader(data, "italic");
     updateFontStyleHeader(data, "underlined");
 
+    // changing the icon bar color
     $("#fill-color").css("border-bottom", `4px solid ${data.bgcolor}`);
     $("#text-color").css("border-bottom", `4px solid ${data.color}`);
 
+    // changing the value in spinner
     $("#font-family").val(data["font-family"]);
     $("#font-size").val(data["font-size"]);
+    // changing the font-family of spinner
     $("#font-family").css("font-family", data["font-family"]);
 }
 
