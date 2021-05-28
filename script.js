@@ -156,23 +156,23 @@ function selectCell(element, event, top, left, down, right) {
 // making changes two way
 function changeHeader([rowID, colID]) {
     console.log(cellData);
-    let data = cellData[rowID - 1][colID - 1];
-    $(".alignment.selected").removeClass("selected");
-    $(`.alignment[data-type=${data.alignment}]`).addClass("selected");
+    // let data = cellData[rowID - 1][colID - 1];
+    // $(".alignment.selected").removeClass("selected");
+    // $(`.alignment[data-type=${data.alignment}]`).addClass("selected");
 
-    updateFontStyleHeader(data, "bold");
-    updateFontStyleHeader(data, "italic");
-    updateFontStyleHeader(data, "underlined");
+    // updateFontStyleHeader(data, "bold");
+    // updateFontStyleHeader(data, "italic");
+    // updateFontStyleHeader(data, "underlined");
 
-    // changing the icon bar color
-    $("#fill-color").css("border-bottom", `4px solid ${data.bgcolor}`);
-    $("#text-color").css("border-bottom", `4px solid ${data.color}`);
+    // // changing the icon bar color
+    // $("#fill-color").css("border-bottom", `4px solid ${data.bgcolor}`);
+    // $("#text-color").css("border-bottom", `4px solid ${data.color}`);
 
-    // changing the value in spinner
-    $("#font-family").val(data["font-family"]);
-    $("#font-size").val(data["font-size"]);
-    // changing the font-family of spinner
-    $("#font-family").css("font-family", data["font-family"]);
+    // // changing the value in spinner
+    // $("#font-family").val(data["font-family"]);
+    // $("#font-size").val(data["font-size"]);
+    // // changing the font-family of spinner
+    // $("#font-family").css("font-family", data["font-family"]);
 }
 
 function updateFontStyleHeader(data, property) {
@@ -463,11 +463,14 @@ function updateCellData(property, value) {
         });
     }
     else {
-        if (cellData[selectedSheet][rowID - 1][colID - 1] != undefined) {
-            cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
-            if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
-                delete cellData[selectedSheet][rowID - 1][colID - 1];
+        $(".input-cell.selected").each(function(index, data) {
+            let [rowID, colID] = getRowColumn(data);
+            if (cellData[selectedSheet][rowID - 1][colID - 1] != undefined) {
+                cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+                if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
+                    delete cellData[selectedSheet][rowID - 1][colID - 1];
+                }
             }
-        }
+        });
     }
 }
