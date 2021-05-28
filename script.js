@@ -20,25 +20,31 @@ for (let i = 1; i <= 100; i++) {
 }
 
 // Generating cells and cell data init
-let cellData = [];
+
+let cellData = {
+    "Sheet1": {}
+};
+
+let selectedSheet = "Sheet1";
+let totalSheets = 1;
+
+let defaultProperties = {
+    "font-family": "Times New Roman",
+    "font-size": "18",
+    "text": "",
+    "bold": false,
+    "italic": false,
+    "underlined": false,
+    "alignment": "left",
+    "color": "#000000",
+    "bgcolor": "#ffffff"
+};
+
 for (let i = 1; i <= 100; i++) {
     let row = $('<div class="cell-row"></div>');
-    let rowData = [];
     for (let j = 1; j <= 100; j++) {
         row.append(`<div id="row-${i}-col-${j}" class="input-cell" contenteditable="false"></div>`);
-        rowData.push({
-            "font-family": "Times New Roman",
-            "font-size": "18",
-            "text": "",
-            "bold": false,
-            "italic": false,
-            "underlined": false,
-            "alignment": "left",
-            "color": "#000000",
-            "bgcolor": "#ffffff"
-        });
     }
-    cellData.push(rowData);
     $("#cells").append(row);
 }
 
@@ -77,6 +83,8 @@ $(".input-cell").dblclick(function (e) {
 
 $(".input-cell").blur(function (e) {
     $(this).attr("contenteditable", "false");
+    // storing text in cell data
+    updateCellData("text", $(this).text());
 });
 
 $(".input-cell").click(function (e) {
@@ -149,7 +157,13 @@ function selectCell(element, event, top, left, down, right) {
 
 // making changes two way
 function changeHeader([rowID, colID]) {
-    let data = cellData[rowID - 1][colID - 1];
+    let data;
+    if (cellData[selectedSheet][rowID - 1] && cellData[selectedSheet][rowID - 1][colID - 1]) {
+        data = cellData[selectedSheet][rowID - 1][colID - 1];
+    }
+    else {
+        data = defaultProperties;
+    }
     $(".alignment.selected").removeClass("selected");
     $(`.alignment[data-type=${data.alignment}]`).addClass("selected");
 
@@ -157,11 +171,14 @@ function changeHeader([rowID, colID]) {
     updateFontStyleHeader(data, "italic");
     updateFontStyleHeader(data, "underlined");
 
+    // changing the icon bar color
     $("#fill-color").css("border-bottom", `4px solid ${data.bgcolor}`);
     $("#text-color").css("border-bottom", `4px solid ${data.color}`);
 
+    // changing the value in spinner
     $("#font-family").val(data["font-family"]);
     $("#font-size").val(data["font-size"]);
+    // changing the font-family of spinner
     $("#font-family").css("font-family", data["font-family"]);
 }
 
@@ -350,10 +367,7 @@ $(".alignment").click(function (e) {
     $(".alignment.selected").removeClass("selected");
     $(this).addClass("selected");
     $(".input-cell.selected").css("text-align", alignment);
-    $(".input-cell.selected").each(function (index, data) {
-        let [rowID, colID] = getRowColumn(data);
-        cellData[rowID - 1][colID - 1].alignment = alignment;
-    });
+    updateCellData("alignment", alignment);
 });
 
 // handling text styles
@@ -373,18 +387,12 @@ function setStyle(element, property, key, value) {
     if ($(element).hasClass("selected")) {
         $(element).removeClass("selected");
         $(".input-cell.selected").css(key, "");
-        $(".input-cell.selected").each(function (index, data) {
-            let [rowID, colID] = getRowColumn(data);
-            cellData[rowID - 1][colID - 1][property] = false;
-        });
+        updateCellData(property, false);
     }
     else {
         $(element).addClass("selected");
         $(".input-cell.selected").css(key, value);
-        $(".input-cell.selected").each(function (index, data) {
-            let [rowID, colID] = getRowColumn(data);
-            cellData[rowID - 1][colID - 1][property] = true;
-        });
+        updateCellData(property, true);
     }
 }
 
@@ -400,19 +408,13 @@ $(".pick-color").colorPick({
             if ($(this.element.children()[1]).attr("id") == "fill-color") {
                 $(".input-cell.selected").css("background-color", this.color);
                 $("#fill-color").css("border-bottom", `4px solid ${this.color}`);
-                $(".input-cell.selected").each((index, data) => {
-                    let [rowID, colID] = getRowColumn(data);
-                    cellData[rowID - 1][colID - 1].bgcolor = this.color;
-                });
+                updateCellData("bgcolor", this.color);
             }
 
             if ($(this.element.children()[1]).attr("id") == "text-color") {
                 $(".input-cell.selected").css("color", this.color);
                 $("#text-color").css("border-bottom", `4px solid ${this.color}`);
-                $(".input-cell.selected").each((index, data) => {
-                    let [rowID, colID] = getRowColumn(data);
-                    cellData[rowID - 1][colID - 1].color = this.color;
-                });
+                updateCellData("color", this.color);
             }
         }
     }
@@ -444,8 +446,48 @@ $(".menu-selector").change(function (e) {
     }
 
     $(".input-cell.selected").css(key, value);
-    $(".input-cell.selected").each((i, data) => {
-        let [rowID, colID] = getRowColumn(data);
-        cellData[rowID - 1][colID - 1][key] = value;
-    });
+    updateCellData(key, value);
 });
+
+// writing data to the cellData object
+function updateCellData(property, value) {
+    // if the value is not equal to default value
+    if (value != defaultProperties[property]) {
+        // iterate over each selected cell
+        $(".input-cell.selected").each(function (index, data) {
+            let [rowID, colID] = getRowColumn(data);
+            // checking if row exists in DB or not
+            // if it exists, that means some cell in that row was updated
+            // if it doesnt, that means first time changes
+            if (cellData[selectedSheet][rowID - 1] == undefined) {
+                cellData[selectedSheet][rowID - 1] = {};
+                cellData[selectedSheet][rowID - 1][colID - 1] = { ...defaultProperties };
+                cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+            }
+            else {
+                // checking if that particular cell in row exists in DB or not
+                if (cellData[selectedSheet][rowID - 1][colID - 1] == undefined) {
+                    cellData[selectedSheet][rowID - 1][colID - 1] = { ...defaultProperties };
+                    cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+                }
+                else {
+                    cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+                }
+            }
+        });
+    }
+    // The value is being changed back to the default value
+    else {
+        $(".input-cell.selected").each(function (index, data) {
+            let [rowID, colID] = getRowColumn(data);
+            // checking if column exists, if it doesn't, that means default props are already set
+            if (cellData[selectedSheet][rowID - 1][colID - 1] != undefined) {
+                cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
+                //    checking if the current object has become equal to default object
+                if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
+                    delete cellData[selectedSheet][rowID - 1][colID - 1];
+                }
+            }
+        });
+    }
+}
