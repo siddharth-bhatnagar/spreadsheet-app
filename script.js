@@ -486,6 +486,9 @@ function updateCellData(property, value) {
                 //    checking if the current object has become equal to default object
                 if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
                     delete cellData[selectedSheet][rowID - 1][colID - 1];
+                    if(Object.keys(cellData[selectedSheet][rowID - 1]).length == 0) {
+                        delete cellData[selectedSheet][rowID - 1];
+                    }
                 }
             }
         });
