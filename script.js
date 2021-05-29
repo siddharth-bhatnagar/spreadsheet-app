@@ -486,7 +486,7 @@ function updateCellData(property, value) {
                 //    checking if the current object has become equal to default object
                 if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
                     delete cellData[selectedSheet][rowID - 1][colID - 1];
-                    if(Object.keys(cellData[selectedSheet][rowID - 1]).length == 0) {
+                    if (Object.keys(cellData[selectedSheet][rowID - 1]).length == 0) {
                         delete cellData[selectedSheet][rowID - 1];
                     }
                 }
@@ -494,3 +494,20 @@ function updateCellData(property, value) {
         });
     }
 }
+
+
+// removes previosly opened modals
+// creates new modal
+// appends that modal to the main app container
+// happens on right click of the mouse
+$(".sheets-tab").on("contextmenu", function (e) {
+    e.preventDefault();
+    $(".sheet-options-modal").remove();
+    let modal = $(`<div class="sheet-options-modal">
+                    <div class="option sheet-rename">Rename</div>
+                    <div class="option sheet-delete">Delete</div>
+                   </div>`);
+
+    modal.css({"left": e.pageX});
+    $(".app-container").append(modal);
+});
