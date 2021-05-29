@@ -481,11 +481,14 @@ function updateCellData(property, value) {
         $(".input-cell.selected").each(function (index, data) {
             let [rowID, colID] = getRowColumn(data);
             // checking if column exists, if it doesn't, that means default props are already set
-            if (cellData[selectedSheet][rowID - 1][colID - 1] != undefined) {
+            if (cellData[selectedSheet][rowID - 1] && cellData[selectedSheet][rowID - 1][colID - 1]) {
                 cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
                 //    checking if the current object has become equal to default object
                 if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
                     delete cellData[selectedSheet][rowID - 1][colID - 1];
+                    if(Object.keys(cellData[selectedSheet][rowID - 1]).length == 0) {
+                        delete cellData[selectedSheet][rowID - 1];
+                    }
                 }
             }
         });
