@@ -550,7 +550,9 @@ function updateCellData(property, value) {
                 cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
                 //    checking if the current object has become equal to default object
                 if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
+                    // Deleting cell column when it becomes default
                     delete cellData[selectedSheet][rowID - 1][colID - 1];
+                    // Deleting row if empty
                     if (Object.keys(cellData[selectedSheet][rowID - 1]).length == 0) {
                         delete cellData[selectedSheet][rowID - 1];
                     }
@@ -560,22 +562,22 @@ function updateCellData(property, value) {
     }
 }
 
-// Handles click on add sheet button
+// Attaching event listeners to newly added sheet-tabs
 function addSheetEvents() {
-    $(".sheets-tab.selected").on("contextmenu", function (e) {
+    $(".sheet-tab.selected").on("contextmenu", function (e) {
         e.preventDefault();
         $(".sheet-options-modal").remove();
         let modal = $(`<div class="sheet-options-modal">
                         <div class="option sheet-rename">Rename</div>
                         <div class="option sheet-delete">Delete</div>
                        </div>`);
-
+    
         modal.css({ "left": e.pageX });
         $(".app-container").append(modal);
     });
 
-    $(".sheets-tab.selected").click(function (e) {
-        $(".sheet.selected").removeClass("selected");
+    $(".sheet-tab.selected").click(function (e) {
+        $(".sheet-tab.selected").removeClass("selected");
         $(this).addClass("selected");
         selectSheet();
     });
@@ -587,7 +589,7 @@ addSheetEvents();
 // creates new modal
 // appends that modal to the main app container
 // happens on right click of the mouse
-$(".sheets-tab").on("contextmenu", function (e) {
+$(".sheet-tab").on("contextmenu", function (e) {
     e.preventDefault();
     $(".sheet-options-modal").remove();
     let modal = $(`<div class="sheet-options-modal">
@@ -599,27 +601,29 @@ $(".sheets-tab").on("contextmenu", function (e) {
     $(".app-container").append(modal);
 });
 
-// adding a blank sheet
+// Adding a blank sheet
 $(".add-sheet").click(function (e) {
     lastAddedSheet += 1;
     totalSheets += 1;
-    cellData[`Sheet ${lastAddedSheet}`] = {};
-    $(".sheet.selected").removeClass("selected");
-    $(".sheets-tab").append(`<div class="sheet selected">Sheet ${lastAddedSheet}</div>`);
+    cellData[`Sheet${lastAddedSheet}`] = {};
+    $(".sheet-tab.selected").removeClass("selected");
+    $(".sheets-tab-container").append(`<div class="sheet-tab selected">Sheet${lastAddedSheet}</div>`);
     selectSheet();
     addSheetEvents();
 });
 
 // Upon selecting a different sheet, this function is triggered
-$(".sheets-tab").click(function (e) {
-    $(".sheet.selected").removeClass("selected");
+$(".sheet-tab").click(function (e) {
+    $(".sheet-tab.selected").removeClass("selected");
     $(this).addClass("selected");
     selectSheet();
 });
 
+// 
 function selectSheet() {
     emptyPreviousSheet();
-    selectedSheet = $(".sheet.selected").text();
+    // Getting the name/key of current sheet
+    selectedSheet = $(".sheet-tab.selected").text();
     loadCurrentSheet();
 }
 

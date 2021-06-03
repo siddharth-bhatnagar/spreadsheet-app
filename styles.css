@@ -287,29 +287,33 @@ body {
     align-items: center;
 }
 
-.sheet-scroll {
+.sheet-scroller {
     margin-right: 10px;
     display: flex;
     align-items: center;
 }
 
-.sheets-tab {
+.scroller:hover {
+    cursor: pointer;
+}
+
+.sheets-tab-container {
     display: flex;
     flex-direction: row;
     border-left: 0.5px solid #e5e5e5;
     overflow: scroll;
 }
 
-.sheets-tab::-webkit-scrollbar {
+.sheets-tab-container::-webkit-scrollbar {
     display: none;
 }
 
-.sheets-tab {
+.sheets-tab-container {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-.sheet {
+.sheet-tab {
     display: flex;
     justify-content: center;
     padding-left: 10px;
@@ -321,17 +325,17 @@ body {
     font-size: 15px;
 }
 
-.sheet.selected {
+.sheet-tab.selected {
     color: #006a4e;
     border-bottom: 5px solid #006a4e;
 }
 
-.sheet:hover {
+.sheet-tab:hover {
     background-color: #e5e5e5;
     cursor: pointer;
 }
 
-.sheet.selected:hover {
+.sheet-tab.selected:hover {
     background-color: #ffffff;
     cursor: default;
 }
