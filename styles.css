@@ -341,6 +341,10 @@ body {
     margin-right: 10px;
 }
 
+.add-sheet:hover {
+    cursor: pointer;
+}
+
 .sheet-options-modal {
     position: absolute;
     background-color: #ffffff;
