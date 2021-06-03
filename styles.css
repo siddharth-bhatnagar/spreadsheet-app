@@ -14,6 +14,7 @@ body {
     background-color: #ffffff;
     color: #000000;
     font-family: 'Raleway', sans-serif;
+    position: relative;
 }
 
 .title-bar {
@@ -286,29 +287,33 @@ body {
     align-items: center;
 }
 
-.sheet-scroll {
+.sheet-scroller {
     margin-right: 10px;
     display: flex;
     align-items: center;
 }
 
-.sheets-tab {
+.scroller:hover {
+    cursor: pointer;
+}
+
+.sheets-tab-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     border-left: 0.5px solid #e5e5e5;
     overflow: scroll;
 }
 
-.sheets-tab::-webkit-scrollbar {
+.sheets-tab-container::-webkit-scrollbar {
     display: none;
 }
 
-.sheets-tab {
+.sheets-tab-container {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-.sheet {
+.sheet-tab {
     display: flex;
     justify-content: center;
     padding-left: 10px;
@@ -320,17 +325,17 @@ body {
     font-size: 15px;
 }
 
-.sheet.selected {
+.sheet-tab.selected {
     color: #006a4e;
     border-bottom: 5px solid #006a4e;
 }
 
-.sheet:hover {
+.sheet-tab:hover {
     background-color: #e5e5e5;
     cursor: pointer;
 }
 
-.sheet.selected:hover {
+.sheet-tab.selected:hover {
     background-color: #ffffff;
     cursor: default;
 }
@@ -338,4 +343,27 @@ body {
 .add-sheet {
     color: #006a4e;
     margin-right: 10px;
+}
+
+.add-sheet:hover {
+    cursor: pointer;
+}
+
+.sheet-options-modal {
+    position: absolute;
+    background-color: #ffffff;
+    bottom: 4vh;
+    left: 200px;
+    -webkit-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+}
+
+.option {
+    padding: 7px 15px 7px 15px;
+}
+
+.option:hover {
+    background-color: #e5e5e5;
+    cursor: pointer;
 }

@@ -7,8 +7,10 @@ const ps = new PerfectScrollbar("#cells", {
 
 // Sheet Column Title and Row Number
 for (let i = 1; i <= 100; i++) {
+
     let columnNumber = i;
     let columnTitle = "";
+
     while (columnNumber != 0) {
         columnNumber--;
         let remainder = columnNumber % 26
@@ -19,15 +21,35 @@ for (let i = 1; i <= 100; i++) {
     $("#rows").append(`<div class="row-name">${i}</div>`);
 }
 
-// Generating cells and cell data init
+//cell data init
+// new structure, only store values of those cells whose default properties have been changed
+/*
+cellData = {
+    "Sheet1": {
+        7: {
+            1: {...defaultProperties},
+            2: {...defaulProperties}
+        },
+        2: {
+            5: {...}
+        }
+    },
+    "Sheet2": {
+        ...
+    }
+}
+*/
 
 let cellData = {
     "Sheet1": {}
 };
 
+// Keeping track of sheets
 let selectedSheet = "Sheet1";
 let totalSheets = 1;
+let lastAddedSheet = 1;
 
+// The default properties every cell has, applied in css
 let defaultProperties = {
     "font-family": "Times New Roman",
     "font-size": "18",
@@ -40,6 +62,8 @@ let defaultProperties = {
     "bgcolor": "#ffffff"
 };
 
+
+// Generating cells
 for (let i = 1; i <= 100; i++) {
     let row = $('<div class="cell-row"></div>');
     for (let j = 1; j <= 100; j++) {
@@ -74,31 +98,51 @@ const getAdjacentCells = (row, col) => {
     return [top, left, down, right];
 }
 
+
+// Double clicking on a cell makes it editable and focuses on that
 $(".input-cell").dblclick(function (e) {
+    // Removes all selected cells first and selects current cell
     $(".input-cell.selected").removeClass("selected top-selected down-selected left-selected right-selected");
+    
     $(this).addClass("selected");
     $(this).attr("contenteditable", "true");
     $(this).focus();
 });
 
+// Upon clicking elsewhere
 $(".input-cell").blur(function (e) {
+    // making the cells uneditable
     $(this).attr("contenteditable", "false");
-    // storing text in cell data
+    
+    // storing text in cellData object
     updateCellData("text", $(this).text());
 });
 
+// Upon single click
 $(".input-cell").click(function (e) {
+    
+    // getting row number and column number of current cell
     const [rowID, colID] = getRowColumn(this);
+    
+    // getting neighbouring cells wrapped in jquery object
     const [top, left, down, right] = getAdjacentCells(rowID, colID);
+    
+    // checking if currently clicked cell has selected class and control key is pressed 
     if ($(this).hasClass("selected") && e.ctrlKey) {
+    
+        // then unselect the current cell and remove classes from adjacent cells 
         unselectCell(this, e, top, left, down, right);
     }
     else {
+
+        // select the current cell and if adjacent cells are selected, add relevant classes to them
         selectCell(this, e, top, left, down, right);
     }
 });
 
+// Handles selection of current cell
 function selectCell(element, event, top, left, down, right) {
+    // If control key was pressed simultaneously
     if (event.ctrlKey) {
         // if top cell exists
         let topSelect;
@@ -149,40 +193,54 @@ function selectCell(element, event, top, left, down, right) {
         }
 
     } else {
+        // If control key was not pressed then remove classes from previous selections
         $(".input-cell.selected").removeClass("selected top-selected down-selected left-selected right-selected");
     }
+    // Adding selected class to current selection
     $(element).addClass("selected");
+
+    // Updating the header based on data in cellData object
     changeHeader(getRowColumn(element));
 }
 
-// making changes two way
+// Handles cell property display on menu-icon bar depending upon property of that cell in cellData object
 function changeHeader([rowID, colID]) {
+
     let data;
+    // if cell exists in cellData
     if (cellData[selectedSheet][rowID - 1] && cellData[selectedSheet][rowID - 1][colID - 1]) {
         data = cellData[selectedSheet][rowID - 1][colID - 1];
     }
     else {
+        // if that row and column didn't exist in cellData
         data = defaultProperties;
     }
+
+    // deselecting the previously selected icon
     $(".alignment.selected").removeClass("selected");
+    // selecting the matching alignment icon
     $(`.alignment[data-type=${data.alignment}]`).addClass("selected");
 
+    // Updating the font style icon selections
     updateFontStyleHeader(data, "bold");
     updateFontStyleHeader(data, "italic");
     updateFontStyleHeader(data, "underlined");
 
-    // changing the icon bar color
+    // Matching the cell color and text color icon div selections to current cell's props
     $("#fill-color").css("border-bottom", `4px solid ${data.bgcolor}`);
     $("#text-color").css("border-bottom", `4px solid ${data.color}`);
 
-    // changing the value in spinner
+    // Updates the value of font-size and family dropdowns
     $("#font-family").val(data["font-family"]);
     $("#font-size").val(data["font-size"]);
-    // changing the font-family of spinner
+
+    // changing the font of selected dropdown item
     $("#font-family").css("font-family", data["font-family"]);
 }
 
+// Handles font-style icon changes based on currently selected property
 function updateFontStyleHeader(data, property) {
+    // if the value of property in data object is true
     if (data[property]) {
         $(`#${property}`).addClass("selected");
     }
@@ -191,7 +249,9 @@ function updateFontStyleHeader(data, property) {
     }
 }
 
+// Handles unselection of cells
 function unselectCell(element, event, top, left, down, right) {
+    // if the user was not writing data in cell, then only remove classes
     if ($(element).attr("contenteditable") == "false") {
         if ($(element).hasClass("top-selected")) {
             top.removeClass("down-selected");
@@ -213,6 +273,7 @@ function unselectCell(element, event, top, left, down, right) {
     }
 }
 
+// For selecting cells with mouse click and drag
 let startCellSelected = false;
 let startCell = {};
 let endCell = {};
@@ -281,7 +342,7 @@ $(".input-cell").mouseenter(function (e) {
     }
 });
 
-// renders selection
+// renders selection via mouse left btn click + drag
 function selectSubMatrix(start, end) {
     $(".input-cell.selected").removeClass("selected top-selected down-selected left-selected right-selected");
     for (let i = Math.min(start.rowID, end.rowID); i <= Math.max(start.rowID, end.rowID); i++) {
@@ -383,6 +444,7 @@ $("#underlined").click(function (e) {
     setStyle(this, "underlined", "text-decoration", "underline");
 });
 
+// Handles click on text-style icons
 function setStyle(element, property, key, value) {
     if ($(element).hasClass("selected")) {
         $(element).removeClass("selected");
@@ -397,6 +459,7 @@ function setStyle(element, property, key, value) {
 }
 
 // renders color picker jquery
+// onColorSelected is invoked twice on page load
 $(".pick-color").colorPick({
     'initialColor': "#ABCD",
     'allowRecent': true,
@@ -420,7 +483,8 @@ $(".pick-color").colorPick({
     }
 });
 
-// clicks on the main div
+// Handles click on image
+// Clicks the div which has color palette
 $("#fill-color").click(function (e) {
     setTimeout(() => {
         $(this).parent().click();
@@ -433,6 +497,7 @@ $("#text-color").click(function (e) {
     }, 10);
 });
 
+// Handles change in font-size/font-family
 $(".menu-selector").change(function (e) {
     let value = $(this).val();
     let key = $(this).attr("id");
@@ -485,8 +550,10 @@ function updateCellData(property, value) {
                 cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
                 //    checking if the current object has become equal to default object
                 if (JSON.stringify(cellData[selectedSheet][rowID - 1][colID - 1]) == JSON.stringify(defaultProperties)) {
+                    // Deleting cell column when it becomes default
                     delete cellData[selectedSheet][rowID - 1][colID - 1];
-                    if(Object.keys(cellData[selectedSheet][rowID - 1]).length == 0) {
+                    // Deleting row if empty
+                    if (Object.keys(cellData[selectedSheet][rowID - 1]).length == 0) {
                         delete cellData[selectedSheet][rowID - 1];
                     }
                 }
@@ -494,3 +561,120 @@ function updateCellData(property, value) {
         });
     }
 }
+
+// Attaching event listeners to newly added sheet-tabs
+function addSheetEvents() {
+    $(".sheet-tab.selected").on("contextmenu", function (e) {
+        e.preventDefault();
+        $(".sheet-options-modal").remove();
+        let modal = $(`<div class="sheet-options-modal">
+                        <div class="option sheet-rename">Rename</div>
+                        <div class="option sheet-delete">Delete</div>
+                       </div>`);
+    
+        modal.css({ "left": e.pageX });
+        $(".app-container").append(modal);
+    });
+
+    $(".sheet-tab.selected").click(function (e) {
+        $(".sheet-tab.selected").removeClass("selected");
+        $(this).addClass("selected");
+        selectSheet();
+    });
+}
+
+addSheetEvents();
+
+// removes previosly opened modals
+// creates new modal
+// appends that modal to the main app container
+// happens on right click of the mouse
+$(".sheet-tab").on("contextmenu", function (e) {
+    e.preventDefault();
+    $(".sheet-options-modal").remove();
+    let modal = $(`<div class="sheet-options-modal">
+                    <div class="option sheet-rename">Rename</div>
+                    <div class="option sheet-delete">Delete</div>
+                   </div>`);
+
+    modal.css({ "left": e.pageX });
+    $(".app-container").append(modal);
+});
+
+// Adding a blank sheet
+$(".add-sheet").click(function (e) {
+    lastAddedSheet += 1;
+    totalSheets += 1;
+    cellData[`Sheet${lastAddedSheet}`] = {};
+    $(".sheet-tab.selected").removeClass("selected");
+    $(".sheets-tab-container").append(`<div class="sheet-tab selected">Sheet${lastAddedSheet}</div>`);
+    selectSheet();
+    addSheetEvents();
+});
+
+// Upon selecting a different sheet, this function is triggered
+$(".sheet-tab").click(function (e) {
+    $(".sheet-tab.selected").removeClass("selected");
+    $(this).addClass("selected");
+    selectSheet();
+});
+
+// 
+function selectSheet() {
+    emptyPreviousSheet();
+    // Getting the name/key of current sheet
+    selectedSheet = $(".sheet-tab.selected").text();
+    loadCurrentSheet();
+}
+
+// traverse on cellData object and get the keys of rows and columns where changes were made
+// Then change their css properties to all the default properties
+function emptyPreviousSheet() {
+    let data = cellData[selectedSheet];
+    let rowKeys = Object.keys(data);
+    for (let rowKey of rowKeys) {
+        let columnKeys = Object.keys(data[rowKey]);
+        let rowID = parseInt(rowKey);
+        for (let columnKey of columnKeys) {
+            let colID = parseInt(columnKey);
+            let cell = $(`#row-${rowID + 1}-col-${colID + 1}`);
+            cell.text("");
+            cell.css({
+                "font-family": "Times New Roman",
+                "font-size": "18px",
+                "font-weight": "normal",
+                "font-style": "normal",
+                "text-decoration": "none",
+                "text-align": "left",
+                "color": "#000000",
+                "background-color": "#ffffff"
+            });
+        }
+    }
+}
+
+// load the currently selected sheet
+function loadCurrentSheet() {
+    let data = cellData[selectedSheet];
+    let rowKeys = Object.keys(data);
+    for (let rowKey of rowKeys) {
+        let columnKeys = Object.keys(data[rowKey]);
+        let rowID = parseInt(rowKey);
+        for (let columnKey of columnKeys) {
+            let colID = parseInt(columnKey);
+            let cell = $(`#row-${rowID + 1}-col-${colID + 1}`);
+            cell.text(data[rowID][colID].text);
+            cell.css({
+                "font-family": data[rowID][colID]["font-family"],
+                "font-size": data[rowID][colID]["font-size"],
+                "font-weight": data[rowID][colID]["bold"] ? "bold" : "normal",
+                "font-style": data[rowID][colID]["italic"] ? "italic" : "normal",
+                "text-decoration": data[rowID][colID]["underlined"] ? "underline" : "none",
+                "text-align": data[rowID][colID]["alignment"],
+                "color": data[rowID][colID]["color"],
+                "background-color": data[rowID][colID]["bgcolor"]
+            });
+        }
+    }
+}
+
