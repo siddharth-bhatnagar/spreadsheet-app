@@ -293,8 +293,14 @@ body {
     align-items: center;
 }
 
+.scroller {
+    font-size: 30px;
+}
+
 .scroller:hover {
     cursor: pointer;
+    transform: scale(1.2);
+    color: #999999;
 }
 
 .sheets-tab-container {
@@ -347,6 +353,7 @@ body {
 
 .add-sheet:hover {
     cursor: pointer;
+    transform: scale(1.2);
 }
 
 .sheet-options-modal {
@@ -366,4 +373,121 @@ body {
 .option:hover {
     background-color: #e5e5e5;
     cursor: pointer;
+}
+
+.sheet-modal-parent {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    background-color: rgba(68, 68, 68, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sheet-rename-modal, .sheet-delete-modal {
+    background-color: #ffffff;
+    -webkit-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    min-width: 400px;
+    width: 30vw;
+}
+
+.sheet-modal-title {
+    text-align: center;
+    font-size: 26px;
+    color: #006a4e;
+    font-weight: bold;
+}
+
+.sheet-modal-input-container, .sheet-modal-detail-container {
+    padding: 20px;
+}
+
+.sheet-modal-detail-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.sheet-modal-input-title, .sheet-modal-detail-title {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.sheet-modal-input {
+    width: 100%;
+    height: 2rem;
+    font-size: 1.2rem;
+    outline-color: #006a4e;
+}
+
+.sheet-modal-confirmation {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   justify-content: space-evenly;
+    padding: 15px;
+}
+
+.button {
+    border: 1px solid;
+    width: 120px;
+    height: 43px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    border-radius: 3px;
+}
+
+.yes-btn {
+    background-color: #006a4e;
+    color: #ffffff;
+}
+
+.yes-btn:hover {
+    background-color: #044434;
+    cursor: pointer;
+}
+
+.no-btn:hover {
+    background-color: #e5e5e5;
+    cursor: pointer;
+}
+
+.delete-icon {
+    margin-right: 2px;
+}
+
+.rename-error {
+    color: red;
+    text-align: left;
+    font-size: 16px;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+.alert-box {
+    background-color: #ffffff;
+    height: 15%;
+    width: 15%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
+}
+
+.alert-text {
+    color: red;
+    font-size: large;
+    font-weight: 800;
 }

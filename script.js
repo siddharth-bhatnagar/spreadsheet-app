@@ -103,7 +103,7 @@ const getAdjacentCells = (row, col) => {
 $(".input-cell").dblclick(function (e) {
     // Removes all selected cells first and selects current cell
     $(".input-cell.selected").removeClass("selected top-selected down-selected left-selected right-selected");
-    
+
     $(this).addClass("selected");
     $(this).attr("contenteditable", "true");
     $(this).focus();
@@ -113,23 +113,23 @@ $(".input-cell").dblclick(function (e) {
 $(".input-cell").blur(function (e) {
     // making the cells uneditable
     $(this).attr("contenteditable", "false");
-    
+
     // storing text in cellData object
     updateCellData("text", $(this).text());
 });
 
 // Upon single click
 $(".input-cell").click(function (e) {
-    
+
     // getting row number and column number of current cell
     const [rowID, colID] = getRowColumn(this);
-    
+
     // getting neighbouring cells wrapped in jquery object
     const [top, left, down, right] = getAdjacentCells(rowID, colID);
-    
+
     // checking if currently clicked cell has selected class and control key is pressed 
     if ($(this).hasClass("selected") && e.ctrlKey) {
-    
+
         // then unselect the current cell and remove classes from adjacent cells 
         unselectCell(this, e, top, left, down, right);
     }
@@ -562,44 +562,146 @@ function updateCellData(property, value) {
     }
 }
 
+$(".app-container").click(function (e) {
+    $(".sheet-options-modal").remove();
+})
+
 // Attaching event listeners to newly added sheet-tabs
 function addSheetEvents() {
     $(".sheet-tab.selected").on("contextmenu", function (e) {
         e.preventDefault();
+        if ($(this).hasClass("selected") == false) {
+            $(".sheet-tab.selected").removeClass("selected");
+            $(this).addClass("selected");
+            selectSheet();
+        }
         $(".sheet-options-modal").remove();
         let modal = $(`<div class="sheet-options-modal">
                         <div class="option sheet-rename">Rename</div>
                         <div class="option sheet-delete">Delete</div>
                        </div>`);
-    
+
         modal.css({ "left": e.pageX });
         $(".app-container").append(modal);
+        $(".sheet-rename").click(function (e) {
+            let renameModal = $(`<div class="sheet-modal-parent">
+                                    <div class="sheet-rename-modal">
+                                        <div class="sheet-modal-title">Rename Sheet</div>
+                                        <div class="sheet-modal-input-container">
+                                            <span class="sheet-modal-input-title">Rename Sheet To: </span>
+                                            <input type="text" class="sheet-modal-input" />
+                                        </div>
+                                        <div class="sheet-modal-confirmation">
+                                            <div class="button yes-btn">OK</div>
+                                            <div class="button no-btn">Cancel</div>
+                                        </div>
+                                    </div>
+                                </div>`);
+
+            $(".app-container").append(renameModal);
+
+            $(".no-btn").click(function (e) {
+                $(".sheet-modal-parent").remove();
+            });
+
+            $('.yes-btn').click(function (e) {
+                renameSheet();
+            });
+
+            $(".sheet-modal-input").keypress(function (e) {
+                if (e.key == "Enter") {
+                    renameSheet();
+                }
+            })
+        });
+
+        $(".sheet-delete").click(function (e) {
+            if (totalSheets > 1) {
+                let deleteModal = $(`<div class="sheet-modal-parent">
+                                    <div class="sheet-delete-modal">
+                                        <div class="sheet-modal-title">Sheet Name</div>
+                                        <div class="sheet-modal-detail-container">
+                                            <span class="sheet-modal-detail-title">Are you sure?</span>
+                                        </div>
+                                        <div class="sheet-modal-confirmation">
+                                            <div class="button yes-btn">
+                                                <div class="material-icons delete-icon">delete</div>
+                                                Delete
+                                            </div>
+                                            <div class="button no-btn">Cancel</div>
+                                        </div>
+                                    </div>
+                                </div>`);
+
+                $(".app-container").append(deleteModal);
+
+                $(".no-btn").click(function (e) {
+                    $(".sheet-modal-parent").remove();
+                });
+
+                $(".yes-btn").click(function (e) {
+                    deleteSheet();
+                });
+            }
+            else {
+                let alertBox = $(`<div class="sheet-modal-parent">
+                                    <div class="alert-box">
+                                        <span class="alert-text">Not Possible!</span>
+                                    </div>
+                                </div>`);
+                $(".app-container").append(alertBox);
+                setTimeout(()=> {
+                    $(".sheet-modal-parent").remove();
+                }, 1000);
+            }
+        });
     });
 
     $(".sheet-tab.selected").click(function (e) {
-        $(".sheet-tab.selected").removeClass("selected");
-        $(this).addClass("selected");
-        selectSheet();
+        if (!$(this).hasClass("selected")) {
+            $(".sheet-tab.selected").removeClass("selected");
+            $(this).addClass("selected");
+            selectSheet();
+        }
     });
 }
 
 addSheetEvents();
 
-// removes previosly opened modals
-// creates new modal
-// appends that modal to the main app container
-// happens on right click of the mouse
-$(".sheet-tab").on("contextmenu", function (e) {
-    e.preventDefault();
-    $(".sheet-options-modal").remove();
-    let modal = $(`<div class="sheet-options-modal">
-                    <div class="option sheet-rename">Rename</div>
-                    <div class="option sheet-delete">Delete</div>
-                   </div>`);
+// Rename Sheet
+function renameSheet() {
+    let name = $(".sheet-modal-input").val();
+    if (name != "" && !Object.keys(cellData).includes(name)) {
+        $(".sheet-tab.selected").text(name);
+        let newCellData = {};
+        for (let i of Object.keys(cellData)) {
+            if (i == selectedSheet) {
+                newCellData[newSheetName] = cellData[selectedSheet];
+            } else {
+                newCellData[i] = cellData[i];
+            }
+        }
 
-    modal.css({ "left": e.pageX });
-    $(".app-container").append(modal);
-});
+        cellData = newCellData;
+        selectedSheet = name;
+        $(".sheet-modal-parent").remove();
+    }
+    else {
+        $(".rename-error").remove();
+        $(".sheet-modal-input-container").append(`<div class="rename-error">Entered name is invalid or already exists!</div>`);
+    }
+}
+
+// Deleting a sheet
+function deleteSheet() {
+    $(".sheet-modal-parent").remove();
+    let index = Object.keys(cellData).indexOf(selectedSheet);
+    if(index == 0) {
+
+    }else {
+        
+    }
+}
 
 // Adding a blank sheet
 $(".add-sheet").click(function (e) {
@@ -612,19 +714,14 @@ $(".add-sheet").click(function (e) {
     addSheetEvents();
 });
 
-// Upon selecting a different sheet, this function is triggered
-$(".sheet-tab").click(function (e) {
-    $(".sheet-tab.selected").removeClass("selected");
-    $(this).addClass("selected");
-    selectSheet();
-});
 
-// 
+// selects sheet
 function selectSheet() {
     emptyPreviousSheet();
     // Getting the name/key of current sheet
     selectedSheet = $(".sheet-tab.selected").text();
     loadCurrentSheet();
+    $("#row-1-col-1").click();
 }
 
 // traverse on cellData object and get the keys of rows and columns where changes were made
