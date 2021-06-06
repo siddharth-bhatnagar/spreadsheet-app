@@ -650,7 +650,7 @@ function addSheetEvents() {
                                     </div>
                                 </div>`);
                 $(".app-container").append(alertBox);
-                setTimeout(()=> {
+                setTimeout(() => {
                     $(".sheet-modal-parent").remove();
                 }, 1000);
             }
@@ -674,11 +674,11 @@ function renameSheet() {
     if (name != "" && !Object.keys(cellData).includes(name)) {
         $(".sheet-tab.selected").text(name);
         let newCellData = {};
-        for (let i of Object.keys(cellData)) {
-            if (i == selectedSheet) {
-                newCellData[newSheetName] = cellData[selectedSheet];
+        for (let sheet of Object.keys(cellData)) {
+            if (sheet == selectedSheet) {
+                newCellData[name] = cellData[sheet];
             } else {
-                newCellData[i] = cellData[i];
+                newCellData[sheet] = cellData[sheet];
             }
         }
 
@@ -696,11 +696,27 @@ function renameSheet() {
 function deleteSheet() {
     $(".sheet-modal-parent").remove();
     let index = Object.keys(cellData).indexOf(selectedSheet);
-    if(index == 0) {
-
-    }else {
-        
+    let currentSheet = $(".sheet-tab.selected");
+    if (index == 0) {
+        let nextSheet = currentSheet.next()[0];
+        if ($(nextSheet).hasClass("selected") == false) {
+            $(".sheet-tab.selected").removeClass("selected");
+            $(nextSheet).addClass("selected");
+            selectSheet();
+        }
     }
+    else {
+        let prevSheet = currentSheet.prev()[0];
+        if ($(prevSheet).hasClass("selected") == false) {
+            $(".sheet-tab.selected").removeClass("selected");
+            $(prevSheet).addClass("selected");
+            selectSheet();
+        }
+    }
+    currentSheet.remove();
+    delete cellData[currentSheet.text()];
+    totalSheets--;
+    console.log(cellData);
 }
 
 // Adding a blank sheet
