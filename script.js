@@ -769,6 +769,7 @@ $(".add-sheet").click(function (e) {
     $(".sheets-tab-container").append(`<div class="sheet-tab selected">Sheet${lastAddedSheet}</div>`);
     selectSheet();
     addSheetEvents();
+    $(".sheet-tab.selected")[0].scrollIntoView();
 });
 
 
@@ -834,3 +835,31 @@ function loadCurrentSheet() {
     }
 }
 
+// Left Arrow, Right Arrow click
+
+$(".scroll-left, .scroll-right").click(function (e) {
+    let keys = Object.keys(cellData);
+    let selectedSheetIndex = keys.indexOf(selectedSheet);
+    let currentSheet = $(".sheet-tab.selected");
+
+    if (selectedSheetIndex != 0 && $(this).text() == "arrow_left") {
+        let prevSheet = currentSheet.prev()[0];
+        if ($(prevSheet).hasClass("selected") == false) {
+            $(".sheet-tab.selected").removeClass("selected");
+            $(prevSheet).addClass("selected");
+            selectSheet();
+        }
+    }
+    else if (selectedSheetIndex != (keys.length - 1) && $(this).text() == "arrow_right") {
+        let nextSheet = currentSheet.next()[0];
+        if ($(nextSheet).hasClass("selected") == false) {
+            $(".sheet-tab.selected").removeClass("selected");
+            $(nextSheet).addClass("selected");
+            selectSheet();
+        }
+    }
+    // Adding bracket notation 0 because scrollIntoView is a JS method, not in jQuery
+    // Javascript methods work only on native DOM objects, not DOM objects wrapped in jQuery
+    // jQuery objects are arrays of DOM elements
+    $(".sheet-tab.selected")[0].scrollIntoView();
+});
