@@ -475,19 +475,16 @@ body {
 }
 
 .alert-box {
-    background-color: #ffffff;
-    height: 15%;
-    width: 15%;
+    background-color: rgba(68, 68, 68, 0.5);
+    height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
-    -webkit-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
-    -moz-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
-    box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
 }
 
 .alert-text {
     color: red;
-    font-size: large;
-    font-weight: 800;
+    font-size: 2rem;
+    font-weight: 600;
 }
