@@ -94,7 +94,7 @@ body {
 }
 
 .menu-selector:hover {
-    background-color: lightcyan;
+    background-color: rgb(230, 255, 255);
 }
 
 #font-family {
@@ -209,7 +209,7 @@ body {
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 .row-name {
@@ -246,7 +246,7 @@ body {
 }
 
 .input-cell:hover {
-    border: 1.5px solid blue;
+    border: 1.9px solid blue;
     cursor: cell;
 }
 
@@ -507,13 +507,13 @@ body {
     top: 0;
     left: 0;
     height: 100vh;
-    width: 40vw;
+    width: 0vw;
     display: flex;
     flex-direction: row;
 }
 
 .file-options-modal {
-    width: 12rem;
+    width: 8rem;
     background-color: #006a4e;
     height: 100%;
     color: #ffffff;
@@ -521,8 +521,9 @@ body {
 
 .file-recent-modal {
     height: 100%;
-    width: 100%;
+    width: calc(40% - 12rem);
     background-color: #ffffff;
+    box-shadow: 5px 0 5px -5px #bda6a6;
 }
 
 .close, .new, .open, .save {
@@ -556,4 +557,9 @@ body {
 .close:hover, .new:hover, .open:hover, .save:hover {
     cursor: pointer;
     background-color: #215a3485;
+}
+
+.file-transparent {
+    height: 100%;
+    width: 60%;
 }
