@@ -913,7 +913,7 @@ $("#menu-file").click(function (e) {
     }, 200);
 
     // Handle modal closing
-    $(".close, .file-transparent, .new").click(function (e) {
+    $(".close, .file-transparent, .new, .save").click(function (e) {
         fileModal.animate({
             width: "0"
         }, 200);
@@ -925,7 +925,7 @@ $("#menu-file").click(function (e) {
     // Handle click on "NEW" option
     $(".new").click(function () {
         if (save) {
-            newExcelBook();
+            newFile();
         }
         else {
             let modal = $(`<div class="sheet-modal-parent">
@@ -944,20 +944,25 @@ $("#menu-file").click(function (e) {
             $(".app-container").append(modal);
 
             $(".no-btn").click(function (e) {
-                newExcelBook();
+                newFile();
                 modal.remove();
             });
 
-            $("yes-btn").click(function(e) {
+            $(".yes-btn").click(function (e) {
                 // calls save file function
-                newExcelBook();
+                saveFile();
+                newFile();
                 modal.remove();
             })
         }
     });
+
+    $(".save").click(function (e) {
+        saveFile();
+    })
 });
 
-function newExcelBook() {
+function newFile() {
     emptyPreviousSheet();
     cellData = {
         "Sheet1": {}
@@ -971,4 +976,39 @@ function newExcelBook() {
     addSheetEvents();
     $(".title-bar").text("Excel - Book");
     $("#row-1-col-1").click();
+}
+
+function saveFile() {
+    let saveModal = $(`<div class="sheet-modal-parent">
+                            <div class="sheet-rename-modal">
+                                <div class="sheet-modal-title">Save File</div>
+                                <div class="sheet-modal-input-container">
+                                    <span class="sheet-modal-input-title">File Name: </span>
+                                    <input type="text" class="sheet-modal-input" value="${$('.title-bar').text()}"/>
+                                </div>
+                                <div class="sheet-modal-confirmation">
+                                    <div class="button yes-btn">Save</div>
+                                    <div class="button no-btn">Cancel</div>
+                                </div>
+                            </div>
+                        </div>`);
+
+    $(".app-container").append(saveModal);
+
+    $(".no-btn").click(function (e) {
+        saveModal.remove();
+    });
+
+
+    $(".yes-btn").click(function(e) {
+        $(".title-bar").text($(".sheet-modal-input").val());
+        let anchorTag = document.createElement("a");
+        $(".app-container").append(anchorTag);
+        anchorTag.href = `data:application/json,${encodeURIComponent(JSON.stringify(cellData))}`;
+        anchorTag.download = $(".title-bar").text() + ".json";
+        anchorTag.click();
+        anchorTag.remove();
+        saveModal.remove();
+        save = true;
+    });
 }
