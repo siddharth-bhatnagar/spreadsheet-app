@@ -48,6 +48,7 @@ let cellData = {
 let selectedSheet = "Sheet1";
 let totalSheets = 1;
 let lastAddedSheet = 1;
+let save = true;
 
 // The default properties every cell has, applied in css
 let defaultProperties = {
@@ -516,6 +517,7 @@ $(".menu-selector").change(function (e) {
 
 // writing data to the cellData object
 function updateCellData(property, value) {
+    let newCellData = cellData;
     // if the value is not equal to default value
     if (value != defaultProperties[property]) {
         // iterate over each selected cell
@@ -559,6 +561,10 @@ function updateCellData(property, value) {
                 }
             }
         });
+    }
+
+    if (save && JSON.stringify(newCellData) != JSON.stringify(cellData)) {
+        save = false;
     }
 }
 
@@ -701,6 +707,7 @@ function renameSheet() {
     // If the entered value is not empty or already present
     if (name != "" && !Object.keys(cellData).includes(name)) {
         // Changing the text of sheet tab
+        save = false;
         $(".sheet-tab.selected").text(name);
         // Updating the key in cellData
         // This appraoch creates a dummy object and we will replace cellData with it 
@@ -729,6 +736,7 @@ function renameSheet() {
 // Handles Sheet deletion
 function deleteSheet() {
     // Removing the modal
+    save = false;
     $(".sheet-modal-parent").remove();
     // index of the sheet being deleted
     let index = Object.keys(cellData).indexOf(selectedSheet);
@@ -763,6 +771,7 @@ function deleteSheet() {
 
 // Adding a blank sheet
 $(".add-sheet").click(function (e) {
+    save = false;
     lastAddedSheet += 1;
     totalSheets += 1;
     cellData[`Sheet${lastAddedSheet}`] = {};
@@ -839,10 +848,14 @@ function loadCurrentSheet() {
 // Left Arrow, Right Arrow click
 
 $(".scroll-left, .scroll-right").click(function (e) {
+    // Storing keys in array
     let keys = Object.keys(cellData);
+    // Finding the index of selected sheet
     let selectedSheetIndex = keys.indexOf(selectedSheet);
+    // Storing ref to the current sheet
     let currentSheet = $(".sheet-tab.selected");
 
+    // Sheets other than first sheet
     if (selectedSheetIndex != 0 && $(this).text() == "arrow_left") {
         let prevSheet = currentSheet.prev()[0];
         if ($(prevSheet).hasClass("selected") == false) {
@@ -851,6 +864,7 @@ $(".scroll-left, .scroll-right").click(function (e) {
             selectSheet();
         }
     }
+    // Sheets other than last sheet
     else if (selectedSheetIndex != (keys.length - 1) && $(this).text() == "arrow_right") {
         let nextSheet = currentSheet.next()[0];
         if ($(nextSheet).hasClass("selected") == false) {
@@ -865,7 +879,9 @@ $(".scroll-left, .scroll-right").click(function (e) {
     $(".sheet-tab.selected")[0].scrollIntoView();
 });
 
-$("#menu-file").click(function(e) {
+// Upon clicking the file option in menu bar
+$("#menu-file").click(function (e) {
+    // Creating a modal
     let fileModal = $(`<div class="file-modal">
                             <div class="file-options-modal">
                                 <div class="close">
@@ -888,19 +904,71 @@ $("#menu-file").click(function(e) {
                             <div class="file-recent-modal"></div>
                             <div class="file-transparent"></div>
                         </div>`);
-    
+
     $(".app-container").append(fileModal);
-    
+
+    // Animate modal opening
     fileModal.animate({
         width: "100vw"
-    }, 300);
+    }, 200);
 
-    $(".close, .file-transparent").click(function(e) {
+    // Handle modal closing
+    $(".close, .file-transparent, .new").click(function (e) {
         fileModal.animate({
             width: "0"
-        }, 300);
+        }, 200);
         setTimeout(() => {
             fileModal.remove();
-        }, 250);
+        }, 150);
+    });
+
+    // Handle click on "NEW" option
+    $(".new").click(function () {
+        if (save) {
+            newExcelBook();
+        }
+        else {
+            let modal = $(`<div class="sheet-modal-parent">
+                                <div class="sheet-delete-modal">
+                                    <div class="sheet-modal-title">${$(".title-bar").text()}</div>
+                                    <div class="sheet-modal-detail-container">
+                                        <span class="sheet-modal-detail-title">Do you want to save changes?</span>
+                                    </div>
+                                    <div class="sheet-modal-confirmation">
+                                        <div class="button yes-btn">Yes</div>
+                                        <div class="button no-btn">No</div>
+                                    </div>
+                                </div>
+                            </div>`);
+
+            $(".app-container").append(modal);
+
+            $(".no-btn").click(function (e) {
+                newExcelBook();
+                modal.remove();
+            });
+
+            $("yes-btn").click(function(e) {
+                // calls save file function
+                newExcelBook();
+                modal.remove();
+            })
+        }
     });
 });
+
+function newExcelBook() {
+    emptyPreviousSheet();
+    cellData = {
+        "Sheet1": {}
+    };
+    totalSheets = 1;
+    lastAddedSheet = 1;
+    selectedSheet = "Sheet1";
+    save = true;
+    $(".sheet-tab").remove();
+    $(".sheets-tab-container").append(`<div class="sheet-tab selected">Sheet1</div>`);
+    addSheetEvents();
+    $(".title-bar").text("Excel - Book");
+    $("#row-1-col-1").click();
+}
