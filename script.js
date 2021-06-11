@@ -924,9 +924,11 @@ $("#menu-file").click(function (e) {
 
     // Handle click on "NEW" option
     $(".new").click(function () {
+        // If file is already saved
         if (save) {
             newFile();
         }
+        // if file is not saved, ask user
         else {
             let modal = $(`<div class="sheet-modal-parent">
                                 <div class="sheet-delete-modal">
@@ -941,13 +943,16 @@ $("#menu-file").click(function (e) {
                                 </div>
                             </div>`);
 
+                            
             $(".app-container").append(modal);
 
+            // Dont save, open new file
             $(".no-btn").click(function (e) {
                 newFile();
                 modal.remove();
             });
 
+            // save, then open new file
             $(".yes-btn").click(function (e) {
                 // calls save file function
                 saveFile();
@@ -957,28 +962,38 @@ $("#menu-file").click(function (e) {
         }
     });
 
+    // Handles click on save option
     $(".save").click(function (e) {
         saveFile();
     })
 });
 
 function newFile() {
+    // Empty the sheet
     emptyPreviousSheet();
+    // reset DB
     cellData = {
         "Sheet1": {}
     };
+    // Set values to default
     totalSheets = 1;
     lastAddedSheet = 1;
     selectedSheet = "Sheet1";
     save = true;
+    // Remove sheet tabs
     $(".sheet-tab").remove();
+    // Add single sheet tab
     $(".sheets-tab-container").append(`<div class="sheet-tab selected">Sheet1</div>`);
+    // Attach event listeners on new sheet
     addSheetEvents();
+    // Change the file title to default title
     $(".title-bar").text("Excel - Book");
+    // select first cell
     $("#row-1-col-1").click();
 }
 
 function saveFile() {
+    // Create modal
     let saveModal = $(`<div class="sheet-modal-parent">
                             <div class="sheet-rename-modal">
                                 <div class="sheet-modal-title">Save File</div>
@@ -995,15 +1010,23 @@ function saveFile() {
 
     $(".app-container").append(saveModal);
 
+    // handles cancel
     $(".no-btn").click(function (e) {
         saveModal.remove();
     });
 
-
+    // Handles changes
     $(".yes-btn").click(function(e) {
+        // Changing the file name
         $(".title-bar").text($(".sheet-modal-input").val());
+        
+        // Downloading file
         let anchorTag = document.createElement("a");
         $(".app-container").append(anchorTag);
+        // The url 'data:' is used to download files
+        // application/json is MIME type for json format
+        // After comma, we append the data which we want to download in our file
+        // encodeURIComponenent handles character encoding so that file downloads correctly
         anchorTag.href = `data:application/json,${encodeURIComponent(JSON.stringify(cellData))}`;
         anchorTag.download = $(".title-bar").text() + ".json";
         anchorTag.click();
