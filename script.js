@@ -913,7 +913,7 @@ $("#menu-file").click(function (e) {
     }, 200);
 
     // Handle modal closing
-    $(".close, .file-transparent, .new, .save").click(function (e) {
+    $(".close, .file-transparent, .new, .save, .open").click(function (e) {
         fileModal.animate({
             width: "0"
         }, 200);
@@ -943,7 +943,7 @@ $("#menu-file").click(function (e) {
                                 </div>
                             </div>`);
 
-                            
+
             $(".app-container").append(modal);
 
             // Dont save, open new file
@@ -965,7 +965,12 @@ $("#menu-file").click(function (e) {
     // Handles click on save option
     $(".save").click(function (e) {
         saveFile();
-    })
+    });
+
+    // Handles open option click
+    $(".open").click(function (e) {
+        openFile();
+    });
 });
 
 function newFile() {
@@ -1016,10 +1021,10 @@ function saveFile() {
     });
 
     // Handles changes
-    $(".yes-btn").click(function(e) {
+    $(".yes-btn").click(function (e) {
         // Changing the file name
         $(".title-bar").text($(".sheet-modal-input").val());
-        
+
         // Downloading file
         let anchorTag = document.createElement("a");
         $(".app-container").append(anchorTag);
@@ -1035,3 +1040,76 @@ function saveFile() {
         save = true;
     });
 }
+
+function openFile() {
+    // creating modal
+    let openModal = $(`<div class="sheet-modal-parent">
+                                <div class="sheet-open-modal">
+                                    <div class="material-icons close-open-file">close</div>
+                                    <div class="sheet-modal-title">Open File</div>
+                                    <div class="sheet-modal-input-container">
+                                        <input type="file" class="file-open" accept="application/json" />
+                                    </div>
+                                </div>
+                            </div>`);
+
+    // loading modal on UI
+    $(".app-container").append(openModal);
+
+    // Handling close icon click
+    $(".close-open-file").click(function (e) {
+        openModal.remove();
+    })
+
+    // Storing ref to the file input
+    let inputFile = $(`input[type="file"]`);
+    // On change event/loading file
+    inputFile.change(function (e) {
+        // selecting the file from event
+        let file = e.target.files[0];
+        // Changing the title of file
+        $(".title-bar").text(file.name.split(".json")[0]);
+        // Creating FileReader() object
+        let reader = new FileReader();
+        // Reading the content of file as text
+        reader.readAsText(file);
+        // Fired as soon as file is read
+        reader.onload = () => {
+            // closing the modal
+            openModal.remove();
+            // Emptying the current sheet
+            emptyPreviousSheet();
+            // Removing the sheet tabs from sheets-tab-container
+            $(".sheet-tab").remove();
+            // Parsing the data and updating cellData Object
+            cellData = JSON.parse(reader.result);
+
+            let keys = Object.keys(cellData);
+            // Iterting over keys and adding new sheet tabs in UI
+            for (let key of keys) {
+                if (key.includes("Sheet")) {
+                    let splittedSheetArray = key.split("Sheet");
+                    if (splittedSheetArray.length == 2 && !isNaN(splittedSheetArray[1])) {
+                        lastlyAddedSheet = parseInt(splittedSheetArray[1]);
+                    }
+                }
+                $(".sheets-tab-container").append(`<div class="sheet-tab selected">${key}</div>`);
+            }
+            // Attaching event listeners on new tabs
+            addSheetEvents();
+            // Removing the selected class from sheet tab
+            $(".sheet-tab.selected").removeClass("selected");
+            // Selecting the first sheet tab
+            $($(".sheet-tab")[0]).addClass("selected");
+            // Setting the properties
+            save = true;
+            selectedSheet = keys[0];
+            totalSheets = keys.length;
+            // Loading the first sheet on UI
+            loadCurrentSheet();
+            // Selecting cell one
+            $("#row-1-col-1").click();
+        };
+    });
+}
+

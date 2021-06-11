@@ -399,7 +399,7 @@ body {
     align-items: center;
 }
 
-.sheet-rename-modal, .sheet-delete-modal {
+.sheet-rename-modal, .sheet-delete-modal, .sheet-open-modal {
     background-color: #ffffff;
     -webkit-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
     -moz-box-shadow: -1px 14px 14px 2px rgba(0, 0, 0, 0.05);
@@ -562,4 +562,29 @@ body {
 .file-transparent {
     height: 100%;
     width: 60%;
+}
+
+.file-open {
+    align-self: center;
+    font-size: 20px;
+    position: relative;
+    top: 0.5rem;
+    left: 5rem;
+}
+
+.close-open-file {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 1.3rem;
+    font-weight: 900;
+}
+
+.close-open-file:hover {
+    cursor: pointer;
+    color: red;
+}
+
+.sheet-open-modal {
+    position: relative;
 }
