@@ -15,6 +15,12 @@ body {
     color: #000000;
     font-family: 'Raleway', sans-serif;
     position: relative;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .title-bar {
@@ -113,18 +119,22 @@ body {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     background-color: #e5e5e5;
+    font-size: 18px;
 }
 
 #selected-cell {
     width: 120px;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    height: 70%;
+    height: 60%;
     display: flex;
     align-items: center;
     overflow: hidden;
     background-color: #ffffff;
     outline: none;
+    box-shadow: 0px 0px 1.5px 0px rgba(0, 0, 0, 0.7);
+    -webkit-box-shadow: 0px 0px 1.5px 0px rgba(0, 0, 0, 0.7);
+    -moz-box-shadow: 0px 0px 1.5px 0px rgba(0, 0, 0, 0.7);
 }
 
 #formula-sign {
@@ -132,19 +142,22 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 70%;
+    height: 60%;
 }
 
 #formula-input {
     width: calc(100vw - 160px);
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    height: 70%;
+    height: 60%;
     display: flex;
     align-items: center;
     overflow: hidden;
     background-color: #ffffff;
     outline: none;
+    box-shadow: 0px 0px 1.5px 0px rgba(0, 0, 0, 0.7);
+    -webkit-box-shadow: 0px 0px 1.5px 0px rgba(0, 0, 0, 0.7);
+    -moz-box-shadow: 0px 0px 1.5px 0px rgba(0, 0, 0, 0.7);
 }
 
 .data-container {
@@ -165,7 +178,7 @@ body {
 #columns {
     height: 25px;
     width: calc(100vw - 26px);
-    border-top: 1px solid #d3d3d3;
+    /* border-top: 1px solid #d3d3d3; */
     display: flex;
     flex-direction: row;
     overflow: hidden;
@@ -429,10 +442,10 @@ body {
 }
 
 .sheet-modal-confirmation {
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   justify-content: space-evenly;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-evenly;
     padding: 15px;
 }
 
@@ -487,4 +500,60 @@ body {
     color: red;
     font-size: 2rem;
     font-weight: 600;
+}
+
+.file-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 40vw;
+    display: flex;
+    flex-direction: row;
+}
+
+.file-options-modal {
+    width: 12rem;
+    background-color: #006a4e;
+    height: 100%;
+    color: #ffffff;
+}
+
+.file-recent-modal {
+    height: 100%;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+.close, .new, .open, .save {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: 18px;
+    font-weight: 400;
+    position: relative;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.close {
+    margin-top: 30px;
+    margin-bottom: 40px;
+}
+
+.close-icon {
+    transform: rotate(90deg);
+}
+
+.close-icon, .new-icon, .open-icon, .save-icon {
+    position: absolute;
+    left: 1rem;
+}
+
+.close:hover, .new:hover, .open:hover, .save:hover {
+    cursor: pointer;
+    background-color: #215a3485;
 }

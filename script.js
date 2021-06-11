@@ -565,6 +565,7 @@ function updateCellData(property, value) {
 // clicking anywhere on screen closes the sheet-options-modal
 $(".app-container").click(function (e) {
     $(".sheet-options-modal").remove();
+    // $(".file-options-modal").remove();
 })
 
 // Attaching event listeners to newly added sheet-tabs
@@ -863,3 +864,4 @@ $(".scroll-left, .scroll-right").click(function (e) {
     // jQuery objects are arrays of DOM elements
     $(".sheet-tab.selected")[0].scrollIntoView();
 });
+
