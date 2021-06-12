@@ -1085,12 +1085,16 @@ function openFile() {
             cellData = JSON.parse(reader.result);
 
             let keys = Object.keys(cellData);
+            // takes this value if its not updated below
+            lastAddedSheet = 1;
             // Iterting over keys and adding new sheet tabs in UI
             for (let key of keys) {
+                // last added sheet to correct value to avoid bug
                 if (key.includes("Sheet")) {
+                    // Array of number possibly
                     let splittedSheetArray = key.split("Sheet");
                     if (splittedSheetArray.length == 2 && !isNaN(splittedSheetArray[1])) {
-                        lastlyAddedSheet = parseInt(splittedSheetArray[1]);
+                        lastAddedSheet = parseInt(splittedSheetArray[1]);
                     }
                 }
                 $(".sheets-tab-container").append(`<div class="sheet-tab selected">${key}</div>`);
