@@ -1117,3 +1117,26 @@ function openFile() {
     });
 }
 
+// Making clipboard object to store the start cell address and cell data
+let clipboard = { startCell: [], cellData: {} };
+// Handles click on copy button
+$("#copy").click(function (e) {
+    // Storing the start cell as idx+1
+    clipboard.startCell = getRowColumn($(".input-cell.selected")[0]);
+    // Traversing on each selected cell element
+    $(".input-cell.selected").each(function(index, data) {
+        // row and col idx+1 of each the current cell 
+        let [rowID, colID] = getRowColumn(data);
+        // if row exits in DB and col exists in DB, it means some changes were made
+        if(cellData[selectedSheet][rowID-1] && cellData[selectedSheet][rowID-1][colID-1]) {
+            // checking if row exits in clipboard's celldata object
+            if(!clipboard[cellData][rowID]) {
+                clipboard[cellData][rowID] = {};
+            }
+            // copying data to clipboard
+            clipboard[cellData][rowID][colID] = {...cellData[selectedSheet][rowID-1][colID-1]};
+        }
+    });
+    console.log(clipboard);
+});
+
