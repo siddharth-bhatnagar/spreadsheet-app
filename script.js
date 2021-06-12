@@ -306,6 +306,7 @@ $(".input-cell").mousemove(function (e) {
             let [rowID, colID] = getRowColumn(this);
             startCell = { "rowID": rowID, "colID": colID };
             startCellSelected = true;
+            $(".input-cell.selected").attr("contenteditable", "false");
             selectSubMatrix(startCell, startCell);
         }
     }
@@ -1117,26 +1118,83 @@ function openFile() {
     });
 }
 
-// Making clipboard object to store the start cell address and cell data
+
+// clipboard object stores the data from startCell to all selected cells in cellData
+// init clipboard
 let clipboard = { startCell: [], cellData: {} };
-// Handles click on copy button
-$("#copy").click(function (e) {
-    // Storing the start cell as idx+1
+// flag to check if cut is clicked
+let contentCut = false;
+$("#cut,#copy").click(function (e) {
+    // If the button clicked was cut
+    if ($(this).text() == "content_cut") {
+        contentCut = true;
+    }
+    // new clipboard
+    clipboard = { startCell: [], cellData: {} };
+    
+    // getting the coordinates of start cell
     clipboard.startCell = getRowColumn($(".input-cell.selected")[0]);
-    // Traversing on each selected cell element
-    $(".input-cell.selected").each(function(index, data) {
-        // row and col idx+1 of each the current cell 
-        let [rowID, colID] = getRowColumn(data);
-        // if row exits in DB and col exists in DB, it means some changes were made
-        if(cellData[selectedSheet][rowID-1] && cellData[selectedSheet][rowID-1][colID-1]) {
-            // checking if row exits in clipboard's celldata object
-            if(!clipboard[cellData][rowID]) {
-                clipboard[cellData][rowID] = {};
+    // Traversing on each selected cell
+    $(".input-cell.selected").each(function (index, data) {
+        // row and col number of cell
+        let [rowId, colId] = getRowColumn(data);
+        // if row and column exists in DB
+        if (cellData[selectedSheet][rowId - 1] && cellData[selectedSheet][rowId - 1][colId - 1]) {
+            // if row doesn't exist in DB
+            if (!clipboard.cellData[rowId]) {
+                clipboard.cellData[rowId] = {};
             }
-            // copying data to clipboard
-            clipboard[cellData][rowID][colID] = {...cellData[selectedSheet][rowID-1][colID-1]};
+            // Making a copy of cell
+            clipboard.cellData[rowId][colId] = { ...cellData[selectedSheet][rowId - 1][colId - 1] };
         }
     });
-    console.log(clipboard);
+    // console.log(clipboard);
 });
 
+$("#paste").click(function (e) {
+    // Clear cells if true
+    if (contentCut) {
+        emptyPreviousSheet();
+    }
+    // rows in clipboard
+    let rows = Object.keys(clipboard.cellData);
+    for (let i of rows) {
+        // columns in clipboard
+        let cols = Object.keys(clipboard.cellData[i]);
+        for (let j of cols) {
+            // Each cell
+            // Deleting from database if content cut was true
+            if (contentCut) {
+                // deleting cell
+                delete cellData[selectedSheet][i - 1][j - 1];
+                // deleting row if empty
+                if (Object.keys(cellData[selectedSheet][i - 1]).length == 0) {
+                    delete cellData[selectedSheet][i - 1];
+                }
+            }
+        }
+    }
+    // coordinates of destination start cell
+    let startCell = getRowColumn($(".input-cell.selected")[0]);
+    // traversal
+    for (let i of rows) {
+        let cols = Object.keys(clipboard.cellData[i]);
+        for (let j of cols) {
+            let rowDistance = parseInt(i) - parseInt(clipboard.startCell[0]);
+            let colDistance = parseInt(j) - parseInt(clipboard.startCell[1]);
+            // if row doesn't exist in DB
+            if (!cellData[selectedSheet][startCell[0] + rowDistance - 1]) {
+                cellData[selectedSheet][startCell[0] + rowDistance - 1] = {};
+            }
+            // copying data in DB from clipboard
+            cellData[selectedSheet][startCell[0] + rowDistance - 1][startCell[1] + colDistance - 1] = { ...clipboard.cellData[i][j] };
+        }
+    }
+    // Sheet reload
+    loadCurrentSheet();
+    // disabling paste
+    if (contentCut) {
+        contentCut = false;
+        clipboard = { startCell: [], cellData: {} };
+    }
+});
