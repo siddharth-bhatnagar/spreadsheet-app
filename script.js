@@ -60,7 +60,9 @@ let defaultProperties = {
     "underlined": false,
     "alignment": "left",
     "color": "#000000",
-    "bgcolor": "#ffffff"
+    "bgcolor": "#ffffff",
+    "upStream": [],
+    "downStream": []
 };
 
 
@@ -529,13 +531,13 @@ function updateCellData(property, value) {
             // if it doesnt, that means first time changes
             if (cellData[selectedSheet][rowID - 1] == undefined) {
                 cellData[selectedSheet][rowID - 1] = {};
-                cellData[selectedSheet][rowID - 1][colID - 1] = { ...defaultProperties };
+                cellData[selectedSheet][rowID - 1][colID - 1] = { ...defaultProperties, "upStream": [], "downStream": [] };
                 cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
             }
             else {
                 // checking if that particular cell in row exists in DB or not
                 if (cellData[selectedSheet][rowID - 1][colID - 1] == undefined) {
-                    cellData[selectedSheet][rowID - 1][colID - 1] = { ...defaultProperties };
+                    cellData[selectedSheet][rowID - 1][colID - 1] = { ...defaultProperties, "upStream": [], "downStream": [] };
                     cellData[selectedSheet][rowID - 1][colID - 1][property] = value;
                 }
                 else {
