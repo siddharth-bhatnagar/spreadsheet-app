@@ -17,7 +17,7 @@ for (let i = 1; i <= 100; i++) {
         columnTitle = String.fromCharCode(65 + remainder) + columnTitle;
         columnNumber = Math.floor(columnNumber / 26);
     }
-    $("#columns").append(`<div class="column-name">${columnTitle}</div>`);
+    $("#columns").append(`<div class="column-name column-${i}" id="column-${columnTitle}">${columnTitle}</div>`);
     $("#rows").append(`<div class="row-name">${i}</div>`);
 }
 
@@ -1198,3 +1198,43 @@ $("#paste").click(function (e) {
         clipboard = { startCell: [], cellData: {} };
     }
 });
+
+$("#formula-input").blur(function (e) {
+
+    if ($(".input-cell.selected").length > 0) {
+        let formula = $(this).text();
+
+        let tempElements = formula.split(" ");
+        let elements = [];
+
+        for (let i of tempElements) {
+            if (i.length >= 2) {
+                i = i.replace("(", "");
+                i = i.replace(")", "");
+                elements.push(i);
+            }
+        }
+        $(".input-cell.selected").each(function(index, data) {
+            if(updateStream(data, elements)) {
+                
+            }   
+            else {
+                alert("Formula is not valid!");
+            }
+        });
+    }
+
+    else {
+        alert("Please select a cell first!");
+    }
+});
+
+function updateStream(cell, elements) {
+    let [rowID, colID] = getRowColumn(cell);
+    let selfColumnCode = $(`.column-${colID}`).attr("id").split("-")[1];
+    console.log(elements,selfColumnCode + rowID);
+    if(elements.includes(selfColumnCode + rowID)) {
+        return false;
+    }
+    return true;
+}
